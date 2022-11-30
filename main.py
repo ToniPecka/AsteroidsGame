@@ -183,7 +183,7 @@ class Planet(SpaceObject):
 # All pressed keys
 pressed_keys = set()
 # All onjects in universe
-objects = list
+objects = []
 
 
 @window.event                           # Decorator can change function or marks function
