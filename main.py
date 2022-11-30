@@ -83,7 +83,7 @@ class Ship(SpaceObject):
             ship.speed_y = ship.speed_y - sin(ship.angle) * ACCELERATION
         if pyglet.window.key.SPACE in pressed_keys:
             laser = Laser()
-            objects.append (laser)
+            objects.append(laser)
         # Colisions
         for obj in list(objects):
             if overlap(self, obj) and self != obj:
@@ -91,7 +91,7 @@ class Ship(SpaceObject):
 
 
 class Laser(SpaceObject):
-    def __init__(self, ship):
+    def __init__(self):
         super().__init__('laser')
         self.x = ship.x
         self.y = ship.y
@@ -104,7 +104,7 @@ class Laser(SpaceObject):
         pass
 
 
-class Asteroid_Large(SpaceObject):
+class AsteroidLarge(SpaceObject):
     def __init__(self):
         super().__init__('asteroid_large')
         self.x = width // 4
@@ -118,19 +118,20 @@ class Asteroid_Large(SpaceObject):
         # Object rotates
         self.angle = self.angle + randrange(1, 5) * dt
     
-    def hit_by_spaceship(self, ship):
-        ship.delete()
-    
+    def hit_by_spaceship(self):
+        #ship.delete()
+        pass
+
     def hit_by_laser(self, laser):
         self.delete()
         laser.delete()
-        for i in range (2):
+        for i in range(2):
             asteroid = Asteroid()
             objects.append(asteroid)
         pyglet.clock.schedule_interval(asteroid.tick, 1/30)
 
 
-class Asteroid(Asteroid_Large):
+class Asteroid(AsteroidLarge):
     def __init__(self):
         super().__init__('asteroid')
         self.x = width // 4
@@ -182,7 +183,7 @@ class Planet(SpaceObject):
 
 # All pressed keys
 pressed_keys = set()
-# All onjects in universe
+# All objects in universe
 objects = []
 
 
@@ -201,8 +202,8 @@ def on_key_release(key, mod):
 @window.event                           # Decorator can change function or marks function
 def draw():
     window.clear()
-    for object in objects:
-        object.draw()
+    for obj in objects:
+        obj.draw()
 
 
 @window.event                           # Decorator can change function or marks function
@@ -277,7 +278,7 @@ objects.append(satellite)
 planet = Planet()
 objects.append(planet)
 
-asteroid_large = Asteroid_Large()
+asteroid_large = AsteroidLarge()
 objects.append(asteroid_large)
 
 
