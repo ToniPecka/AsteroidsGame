@@ -10,7 +10,8 @@ width = 500
 # Constant
 ROTATION_SPEED = 3
 ACCELERATION = 10
-LASER_SPEED = 20
+LASER_SPEED = 30
+LASER_COOLDOWN = 3
 
 # Picture names: 'ship' 'laser' 'satellite' 'star' 'planet' 'asteroid_large' 'asteroid' and space for sprite
 picture_dict = {
@@ -33,7 +34,7 @@ class SpaceObject:
         self.speed_x = 0
         self.speed_y = 0
         self.angle = 0
-        self.radius = 30
+        self.radius = 20
         self.sprite = picture_dict[sprite_name]
 
     def draw(self):
@@ -55,11 +56,11 @@ class SpaceObject:
             object.remove(self)
         except ValueError:
             pass
-    
-    def hit_by_spaceship(self, ship):
+
+    def hit_by_spaceship(self):
         pass
 
-    def hit_by_laser(self, laser):
+    def hit_by_laser(self):
         pass
 
 
@@ -84,10 +85,11 @@ class Ship(SpaceObject):
         if pyglet.window.key.SPACE in pressed_keys:
             laser = Laser()
             objects.append(laser)
-        # Colisions
+'''        # Colisions
         for obj in list(objects):
             if overlap(self, obj) and self != obj:
                 obj.hit_by_spaceship(self)
+'''
 
 
 class Laser(SpaceObject):
@@ -96,12 +98,14 @@ class Laser(SpaceObject):
         self.x = ship.x
         self.y = ship.y
         self.angle = ship.angle
-        self.speed_x = ship.speed_x + cos(self.angle) * LASER_SPEED
-        self.speed_y = ship.speed_y + sin(self.angle) * LASER_SPEED
+        self.speed_x = ship.speed_x + LASER_SPEED
+        self.speed_y = ship.speed_y + LASER_SPEED
         self.radius = 15
     
     def tick(self, dt):
-        pass
+        super().tick(dt)
+        
+
 
 
 class AsteroidLarge(SpaceObject):
@@ -117,18 +121,21 @@ class AsteroidLarge(SpaceObject):
         super().tick(dt)
         # Object rotates
         self.angle = self.angle + randrange(1, 5) * dt
-    
-    def hit_by_spaceship(self):
-        #ship.delete()
-        pass
 
-    def hit_by_laser(self, laser):
+    def hit_by_spaceship(self):
+        super().hit_by_spaceship(self)
         self.delete()
-        laser.delete()
+        ship.delete()
+        print("You are DEAD!")
+
+    def hit_by_laser(self):
+        super().hit_by_laser(self)
+        self.delete()
+        '''laser.delete()'''
         for i in range(2):
             asteroid = Asteroid()
             objects.append(asteroid)
-        pyglet.clock.schedule_interval(asteroid.tick, 1/30)
+            pyglet.clock.schedule_interval(asteroid.tick, 1/30)
 
 
 class Asteroid(AsteroidLarge):
@@ -145,11 +152,12 @@ class Asteroid(AsteroidLarge):
         # Object rotates
         self.angle = self.angle + randrange(1, 5) * dt
     
-    def hit_by_spaceship(self, ship):
+    def hit_by_spaceship(self):
+        super().hit_by_spaceship()
         ship.delete()
     
-    def hit_by_laser(self, laser):
-        pass
+    def hit_by_laser(self):
+        super().hit_by_laser()
 
 
 class Satellite(SpaceObject):
@@ -190,13 +198,13 @@ objects = []
 @window.event                           # Decorator can change function or marks function
 def on_key_press(key, mod):
     pressed_keys.add(key)
-    print(key)
+    # print(key)
 
 
 @window.event                           # Decorator can change function or marks function
 def on_key_release(key, mod):
     pressed_keys.discard(key)
-    print(key)
+    # print(key)
 
 
 @window.event                           # Decorator can change function or marks function
